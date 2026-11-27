@@ -7,3 +7,8 @@ Node.js + Express REST API (MongoDB, JWT, Swagger).
 3. `npm start` -> http://localhost:3000, Swagger: /api-docs
 
 Swagger UI: /api-docs
+
+## Auth endpoints
+- POST /auth/register
+- POST /auth/login
+- GET /auth/me
