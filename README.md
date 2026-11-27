@@ -12,3 +12,8 @@ Swagger UI: /api-docs
 - POST /auth/register
 - POST /auth/login
 - GET /auth/me
+
+## Auth endpoints
+- POST /auth/register
+- POST /auth/login
+- GET /auth/me
