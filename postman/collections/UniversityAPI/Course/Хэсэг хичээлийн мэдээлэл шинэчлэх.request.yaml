@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:3000/courses/1
+method: POST
+order: 4000

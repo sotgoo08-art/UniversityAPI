@@ -1,0 +1,11 @@
+$kind: http-request
+url: http://localhost:3000/students
+method: GET
+body:
+  type: json
+  content: ""
+order: 1792139368657
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"

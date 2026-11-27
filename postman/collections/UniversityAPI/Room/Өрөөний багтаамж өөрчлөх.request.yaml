@@ -1,0 +1,11 @@
+$kind: http-request
+url: http://localhost:3000/rooms/1
+method: PATCH
+body:
+  type: json
+  content: '{"capacity":50}'
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 5000

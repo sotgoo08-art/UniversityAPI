@@ -1,0 +1,11 @@
+$kind: http-request
+url: http://localhost:3000/students/2
+method: DELETE
+body:
+  type: json
+  content: ""
+order: 4499748986403944
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"

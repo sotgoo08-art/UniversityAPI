@@ -1,0 +1,1248 @@
+openapi: 3.0.3
+info:
+  title: University Course Management API
+  version: 1.0.0
+  description: Сургалтын системийн REST API. Postman collection-той ижил бүлэглэлтэй. JWT Bearer token шаардана (Auth/login, register болон Lab 7-ийн GET-ээс бусад)
+servers:
+  - url: http://localhost:3000
+security:
+  - BearerAuth: []
+tags:
+  - name: Students
+    description: Оюутны CRUD, хайлт (?search=)
+  - name: Course
+    description: Хичээлийн CRUD, шүүлт (?credits=, ?code=)
+  - name: Relationship
+    description: Resource хоорондын холбоос
+  - name: Auth
+    description: Бүртгэл, нэвтрэлт, миний мэдээлэл
+  - name: Room
+    description: Өрөөний CRUD, шүүлт (?building=, ?minCapacity=)
+  - name: Teacher
+    description: Багшийн CRUD
+  - name: Department
+    description: Тэнхимийн CRUD
+  - name: Lab 7
+    description: Лабораторийн ажил №7: /api/courses, /api/auth/login
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      description: Resource-ийн id
+      schema:
+        type: integer
+        example: 1
+  responses:
+    BadRequest:
+      description: 400 · Өгөгдөл буруу (шаардлагатай талбар дутуу эсвэл Validation failed)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
+    Unauthorized:
+      description: 401 · Нэвтрэх шаардлагатай эсвэл token хүчингүй, хугацаа дууссан
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: 403 · Энэ үйлдлийг хийх эрхгүй
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: 404 · Олдсонгүй
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+    ValidationError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Validation failed
+        errors:
+          type: array
+          items:
+            type: string
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          example: admin
+        password:
+          type: string
+          example: Admin123!
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOi...
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            username:
+              type: string
+              example: admin
+            role:
+              type: string
+              example: admin
+    RegisterRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          example: student2
+        password:
+          type: string
+          example: Student123!
+    Student:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        firstName:
+          type: string
+          example: Bold
+        lastName:
+          type: string
+          example: Ganbayar
+        email:
+          type: string
+          example: bold.g@example.com
+    StudentInput:
+      type: object
+      required: [firstName, lastName, email]
+      properties:
+        firstName:
+          type: string
+          example: Bold
+        lastName:
+          type: string
+          example: Ganbayar
+        email:
+          type: string
+          example: bold.g@example.com
+    StudentPatch:
+      type: object
+      description: Өөрчлөх талбаруудыг л илгээнэ
+      properties:
+        firstName:
+          type: string
+          example: Bold
+        lastName:
+          type: string
+          example: Ganbayar
+        email:
+          type: string
+          example: bold.g@example.com
+    Course:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        code:
+          type: string
+          example: M.SW216
+        name:
+          type: string
+          example: Python programming
+        credits:
+          type: integer
+          example: 2
+        departmentId:
+          type: integer
+          example: 1
+        teacherId:
+          type: integer
+          example: 1
+        roomId:
+          type: integer
+          example: 1
+    CourseInput:
+      type: object
+      required: [code, name, credits, departmentId, teacherId, roomId]
+      properties:
+        code:
+          type: string
+          example: M.SW216
+        name:
+          type: string
+          example: Python programming
+        credits:
+          type: integer
+          example: 2
+        departmentId:
+          type: integer
+          example: 1
+        teacherId:
+          type: integer
+          example: 1
+        roomId:
+          type: integer
+          example: 1
+    CoursePatch:
+      type: object
+      description: Өөрчлөх талбаруудыг л илгээнэ
+      properties:
+        code:
+          type: string
+          example: M.SW216
+        name:
+          type: string
+          example: Python programming
+        credits:
+          type: integer
+          example: 2
+        departmentId:
+          type: integer
+          example: 1
+        teacherId:
+          type: integer
+          example: 1
+        roomId:
+          type: integer
+          example: 1
+    Room:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        code:
+          type: string
+          example: 2203
+        building:
+          type: string
+          example: 2
+        capacity:
+          type: integer
+          example: 40
+    RoomInput:
+      type: object
+      required: [code, building, capacity]
+      properties:
+        code:
+          type: string
+          example: 2203
+        building:
+          type: string
+          example: 2
+        capacity:
+          type: integer
+          example: 40
+    RoomPatch:
+      type: object
+      description: Өөрчлөх талбаруудыг л илгээнэ
+      properties:
+        code:
+          type: string
+          example: 2203
+        building:
+          type: string
+          example: 2
+        capacity:
+          type: integer
+          example: 40
+    Teacher:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        firstName:
+          type: string
+          example: Anu
+        lastName:
+          type: string
+          example: Bat
+        email:
+          type: string
+          example: anu@msue.edu.mn
+        departmentId:
+          type: integer
+          example: 2
+    TeacherInput:
+      type: object
+      required: [firstName, lastName, email, departmentId]
+      properties:
+        firstName:
+          type: string
+          example: Anu
+        lastName:
+          type: string
+          example: Bat
+        email:
+          type: string
+          example: anu@msue.edu.mn
+        departmentId:
+          type: integer
+          example: 2
+    TeacherPatch:
+      type: object
+      description: Өөрчлөх талбаруудыг л илгээнэ
+      properties:
+        firstName:
+          type: string
+          example: Anu
+        lastName:
+          type: string
+          example: Bat
+        email:
+          type: string
+          example: anu@msue.edu.mn
+        departmentId:
+          type: integer
+          example: 2
+    Department:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        code:
+          type: string
+          example: PH
+        name:
+          type: string
+          example: Physics
+    DepartmentInput:
+      type: object
+      required: [code, name]
+      properties:
+        code:
+          type: string
+          example: PH
+        name:
+          type: string
+          example: Physics
+    DepartmentPatch:
+      type: object
+      description: Өөрчлөх талбаруудыг л илгээнэ
+      properties:
+        code:
+          type: string
+          example: PH
+        name:
+          type: string
+          example: Physics
+    LabCourse:
+      type: object
+      required: [code, title, credit]
+      properties:
+        id:
+          type: integer
+          example: 1
+        code:
+          type: string
+          example: M.SW322
+        title:
+          type: string
+          example: Веб систем ба технологи
+        credit:
+          type: integer
+          example: 3
+
+paths:
+  /students:
+    get:
+      tags: [Students]
+      summary: Бүх оюутан авах, хайх
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Нэрээр хайх (том, жижиг үсэг ялгахгүй)
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Students]
+      summary: Шинэ оюутан нэмэх (admin, teacher)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentInput'
+      responses:
+        '201':
+          description: Амжилттай нэмэгдсэн
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /students/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Students]
+      summary: Нэг оюутан id-гаар авах
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Students]
+      summary: Оюутан бүтнээр нь шинэчлэх (admin, teacher)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentInput'
+      responses:
+        '200':
+          description: Амжилттай засагдсан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Students]
+      summary: Оюутан хэсэгчлэн шинэчлэх (admin, teacher)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentPatch'
+      responses:
+        '200':
+          description: Амжилттай засагдсан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Students]
+      summary: Оюутан устгах (admin)
+      responses:
+        '204':
+          description: Амжилттай устгасан (хариуны body байхгүй)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /courses:
+    get:
+      tags: [Course]
+      summary: Бүх хичээл авах, шүүх
+      parameters:
+        - name: credits
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Кредитээр шүүх
+        - name: code
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Кодоор шүүх
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Course]
+      summary: Шинэ хичээл нэмэх (admin, teacher)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseInput'
+      responses:
+        '201':
+          description: Амжилттай нэмэгдсэн
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /courses/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Course]
+      summary: Нэг хичээл id-гаар авах
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Course]
+      summary: Хичээл бүтнээр нь шинэчлэх (admin, teacher)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseInput'
+      responses:
+        '200':
+          description: Амжилттай засагдсан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Course]
+      summary: Хичээл хэсэгчлэн шинэчлэх (admin, teacher)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoursePatch'
+      responses:
+        '200':
+          description: Амжилттай засагдсан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Course]
+      summary: Хичээл устгах (admin)
+      responses:
+        '204':
+          description: Амжилттай устгасан (хариуны body байхгүй)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /departments/{id}/teachers:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Relationship]
+      summary: Тэнхим → Багш нар
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Teacher'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /departments/{id}/courses:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Relationship]
+      summary: Тэнхим → Хичээлүүд
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /teachers/{id}/courses:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Relationship]
+      summary: Багш → Хичээлүүд
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /rooms/{id}/courses:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Relationship]
+      summary: Өрөө → Хичээлүүд
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /courses/{id}/teacher:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Relationship]
+      summary: Хичээл → Багш
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Teacher'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /courses/{id}/room:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Relationship]
+      summary: Хичээл → Өрөө
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /courses/{id}/department:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Relationship]
+      summary: Хичээл → Тэнхим
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Нэвтэрч JWT token авах
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Амжилттай. token болон user буцна
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: username эсвэл password хоосон
+        '401':
+          description: Нэвтрэх нэр эсвэл нууц үг буруу
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Шинэ хэрэглэгч бүртгэх (эрх нь үргэлж student)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Бүртгэгдлээ
+        '400':
+          description: username эсвэл password хоосон
+        '409':
+          description: username давхардсан
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Миний мэдээлэл (нэвтэрсэн хэрэглэгч, профайл)
+      responses:
+        '200':
+          description: Хэрэглэгч, профайл
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /rooms:
+    get:
+      tags: [Room]
+      summary: Бүх өрөө авах, шүүх
+      parameters:
+        - name: building
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Барилгын дугаараар шүүх
+        - name: minCapacity
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Хамгийн бага багтаамжаар шүүх
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Room'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Room]
+      summary: Шинэ өрөө нэмэх (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomInput'
+      responses:
+        '201':
+          description: Амжилттай нэмэгдсэн
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /rooms/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Room]
+      summary: Нэг өрөө id-гаар авах
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Room]
+      summary: Өрөө бүтнээр нь шинэчлэх (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomInput'
+      responses:
+        '200':
+          description: Амжилттай засагдсан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Room]
+      summary: Өрөө хэсэгчлэн шинэчлэх (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomPatch'
+      responses:
+        '200':
+          description: Амжилттай засагдсан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Room]
+      summary: Өрөө устгах (admin)
+      responses:
+        '204':
+          description: Амжилттай устгасан (хариуны body байхгүй)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /teachers:
+    get:
+      tags: [Teacher]
+      summary: Бүх багш авах
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Teacher'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Teacher]
+      summary: Шинэ багш нэмэх (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeacherInput'
+      responses:
+        '201':
+          description: Амжилттай нэмэгдсэн
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Teacher'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /teachers/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Teacher]
+      summary: Нэг багш id-гаар авах
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Teacher'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Teacher]
+      summary: Багш бүтнээр нь шинэчлэх (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeacherInput'
+      responses:
+        '200':
+          description: Амжилттай засагдсан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Teacher'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Teacher]
+      summary: Багш хэсэгчлэн шинэчлэх (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeacherPatch'
+      responses:
+        '200':
+          description: Амжилттай засагдсан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Teacher'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Teacher]
+      summary: Багш устгах (admin)
+      responses:
+        '204':
+          description: Амжилттай устгасан (хариуны body байхгүй)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /departments:
+    get:
+      tags: [Department]
+      summary: Бүх тэнхим авах
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Department]
+      summary: Шинэ тэнхим нэмэх (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentInput'
+      responses:
+        '201':
+          description: Амжилттай нэмэгдсэн
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /departments/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Department]
+      summary: Нэг тэнхим id-гаар авах
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Department]
+      summary: Тэнхим бүтнээр нь шинэчлэх (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentInput'
+      responses:
+        '200':
+          description: Амжилттай засагдсан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Department]
+      summary: Тэнхим хэсэгчлэн шинэчлэх (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentPatch'
+      responses:
+        '200':
+          description: Амжилттай засагдсан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Department]
+      summary: Тэнхим устгах (admin)
+      responses:
+        '204':
+          description: Амжилттай устгасан (хариуны body байхгүй)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/auth/login:
+    post:
+      tags: [Lab 7]
+      summary: Нэвтэрч JWT token авах
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Амжилттай. token болон user буцна
+        '400':
+          description: username эсвэл password хоосон
+        '401':
+          description: Нэвтрэх нэр эсвэл нууц үг буруу
+  /api/courses:
+    get:
+      tags: [Lab 7]
+      summary: Бүх хичээлийн жагсаалт авах
+      security: []
+      responses:
+        '200':
+          description: Амжилттай
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LabCourse'
+    post:
+      tags: [Lab 7]
+      summary: Шинэ хичээл нэмэх (admin, teacher)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LabCourse'
+      responses:
+        '201':
+          description: Амжилттай нэмэгдсэн
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabCourse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /api/courses/{id}:
+    parameters:
+      - $ref: '#/components/parameters/Id'
+    get:
+      tags: [Lab 7]
+      summary: Нэг хичээлийн мэдээлэл авах
+      security: []
+      responses:
+        '200':
+          description: Хичээлийн мэдээлэл
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabCourse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Lab 7]
+      summary: Хичээл засах (admin, teacher)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LabCourse'
+      responses:
+        '200':
+          description: Амжилттай засагдсан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LabCourse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Lab 7]
+      summary: Хичээл устгах (admin)
+      responses:
+        '200':
+          description: Амжилттай устгасан
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'

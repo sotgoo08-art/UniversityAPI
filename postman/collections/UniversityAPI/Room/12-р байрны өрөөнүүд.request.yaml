@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://localhost:3000/rooms?building=12
+method: GET
+queryParams:
+  building: "12"
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 8000

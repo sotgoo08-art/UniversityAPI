@@ -1,0 +1,11 @@
+$kind: http-request
+url: http://localhost:3000/students
+method: POST
+body:
+  type: json
+  content: '{"firstName":"Bold","lastName":"Ganbayar","email":"bold.g@example.com"}'
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 74120414636285

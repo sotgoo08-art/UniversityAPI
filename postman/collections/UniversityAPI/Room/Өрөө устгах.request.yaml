@@ -1,0 +1,11 @@
+$kind: http-request
+url: http://localhost:3000/rooms/3
+method: DELETE
+body:
+  type: json
+  content: ""
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 6000

@@ -1,0 +1,879 @@
+openapi: 3.0.3
+info:
+  title: University API
+  version: 1.0.0
+  description: >
+    Postman collection (UniversityAPI) дээр үндэслэсэн Auth, Course, Department,
+    Room, Students, Teacher болон Relationship endpoint-үүдийн OpenAPI баримт бичиг.
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username:
+          type: string
+          example: admin
+        password:
+          type: string
+          example: Admin123!
+
+    CourseCreate:
+      type: object
+      required: [code, name, credits, departmentId, teacherId, roomId]
+      properties:
+        code:
+          type: string
+          example: M.SW322
+        name:
+          type: string
+          example: Web System and Technology
+        credits:
+          type: integer
+          example: 3
+        departmentId:
+          type: integer
+          example: 1
+        teacherId:
+          type: integer
+          example: 1
+        roomId:
+          type: integer
+          example: 1
+
+    CourseUpdate:
+      type: object
+      properties:
+        code:
+          type: string
+          example: M.SW322
+        name:
+          type: string
+          example: Web System and Technology
+        credits:
+          type: integer
+          example: 4
+        departmentId:
+          type: integer
+          example: 1
+        teacherId:
+          type: integer
+          example: 1
+        roomId:
+          type: integer
+          example: 1
+
+    DepartmentInput:
+      type: object
+      required: [code, name]
+      properties:
+        code:
+          type: string
+          example: IT
+        name:
+          type: string
+          example: Information Technology
+
+    RoomInput:
+      type: object
+      required: [code, building, capacity]
+      properties:
+        code:
+          type: string
+          example: "2203"
+        building:
+          type: string
+          example: "2"
+        capacity:
+          type: integer
+          example: 40
+
+    StudentCreate:
+      type: object
+      required: [firstName, lastName, email]
+      properties:
+        firstName:
+          type: string
+          example: Bold
+        lastName:
+          type: string
+          example: Ganbayar
+        email:
+          type: string
+          example: bold.g@example.com
+
+    TeacherInput:
+      type: object
+      required: [firstName, lastName, email, departmentId]
+      properties:
+        firstName:
+          type: string
+          example: Ulambayar
+        lastName:
+          type: string
+          example: Turtogtokh
+        email:
+          type: string
+          example: ulambayar@msue.edu.mn
+        departmentId:
+          type: integer
+          example: 1
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Validation failed
+        errors:
+          type: array
+          items:
+            type: string
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Нэвтрэх (JWT token авах)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              validLogin:
+                summary: Зөв нэвтрэлт
+                value:
+                  username: admin
+                  password: Admin123!
+              wrongPassword:
+                summary: Буруу нууц үг
+                value:
+                  username: admin
+                  password: wrong
+      responses:
+        "200":
+          description: Амжилттай нэвтэрсэн
+        "400":
+          description: Буруу хүсэлт
+        "401":
+          description: Нэвтрэх нэр эсвэл нууц үг буруу
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Миний мэдээлэл
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Одоогийн хэрэглэгчийн мэдээлэл
+        "401":
+          description: Token дутуу эсвэл буруу
+
+  /courses:
+    get:
+      tags: [Course]
+      summary: Бүх хичээл харах (credits, code шүүлтүүртэй)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: credits
+          schema:
+            type: string
+            example: "3"
+          description: Кредитээр шүүх (жнь 3 кредиттэй хичээлүүд)
+        - in: query
+          name: code
+          schema:
+            type: string
+            example: M.SW322
+          description: Кодоор хайх
+      responses:
+        "200":
+          description: Хичээлийн жагсаалт
+        "401":
+          description: Нэвтрэх шаардлагатай
+    post:
+      tags: [Course]
+      summary: Хичээл нэмэх
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseCreate'
+      responses:
+        "201":
+          description: Хичээл үүслээ
+        "400":
+          description: Validation failed
+        "401":
+          description: Нэвтрэх шаардлагатай
+        "403":
+          description: Эрх хүрэлцэхгүй
+
+  /courses/{id}:
+    get:
+      tags: [Course]
+      summary: Нэг хичээл id-гаар харах
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      responses:
+        "200":
+          description: Хичээлийн мэдээлэл
+        "404":
+          description: Олдсонгүй
+    put:
+      tags: [Course]
+      summary: Хичээл бүтнээр солих
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseCreate'
+      responses:
+        "200":
+          description: Шинэчлэгдлээ
+        "400":
+          description: Validation failed
+        "404":
+          description: Олдсонгүй
+    patch:
+      tags: [Course]
+      summary: Кредит / хэсэгчилсэн мэдээлэл өөрчлөх
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CourseUpdate'
+            example:
+              credits: 4
+      responses:
+        "200":
+          description: Шинэчлэгдлээ
+        "400":
+          description: Validation failed
+        "404":
+          description: Олдсонгүй
+    delete:
+      tags: [Course]
+      summary: Хичээлийн мэдээлэл устгах
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "2"
+      responses:
+        "200":
+          description: Устгагдлаа
+        "403":
+          description: Эрх хүрэлцэхгүй
+        "404":
+          description: Олдсонгүй
+
+  /courses/{id}/teacher:
+    get:
+      tags: [Relationship]
+      summary: Хичээл - Багш холбоос харах
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      responses:
+        "200":
+          description: Хичээлийг заах багш
+        "404":
+          description: Олдсонгүй
+
+  /courses/{id}/room:
+    get:
+      tags: [Relationship]
+      summary: Хичээл - Өрөө холбоос харах
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      responses:
+        "200":
+          description: Хичээл орох өрөө
+        "404":
+          description: Олдсонгүй
+
+  /courses/{id}/department:
+    get:
+      tags: [Relationship]
+      summary: Хичээл - Тэнхим холбоос харах
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      responses:
+        "200":
+          description: Харьяа тэнхим
+        "404":
+          description: Олдсонгүй
+
+  /departments:
+    get:
+      tags: [Department]
+      summary: Бүх тэнхим авах
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Тэнхимийн жагсаалт
+    post:
+      tags: [Department]
+      summary: Тэнхим нэмэх
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentInput'
+            example:
+              code: PH
+              name: Physics
+      responses:
+        "201":
+          description: Үүслээ
+
+  /departments/{id}:
+    get:
+      tags: [Department]
+      summary: Нэг тэнхим авах
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      responses:
+        "200":
+          description: Тэнхимийн мэдээлэл
+        "404":
+          description: Олдсонгүй
+    put:
+      tags: [Department]
+      summary: Тэнхим бүтнээр солих
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentInput'
+      responses:
+        "200":
+          description: Шинэчлэгдлээ
+    patch:
+      tags: [Department]
+      summary: Тэнхимийн нэр өөрчлөх
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Informatics
+      responses:
+        "200":
+          description: Шинэчлэгдлээ
+    delete:
+      tags: [Department]
+      summary: Тэнхим устгах
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "2"
+      responses:
+        "200":
+          description: Устгагдлаа
+
+  /departments/{id}/teachers:
+    get:
+      tags: [Relationship]
+      summary: Тэнхим - Багш нар
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      responses:
+        "200":
+          description: Тэнхимийн багш нар
+
+  /departments/{id}/courses:
+    get:
+      tags: [Relationship]
+      summary: Тэнхим - Хичээлүүд
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      responses:
+        "200":
+          description: Тэнхимийн хичээлүүд
+
+  /rooms:
+    get:
+      tags: [Room]
+      summary: Бүх өрөө авах (building, minCapacity шүүлтүүртэй)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: building
+          schema:
+            type: string
+            example: "2"
+        - in: query
+          name: minCapacity
+          schema:
+            type: string
+            example: "40"
+      responses:
+        "200":
+          description: Өрөөнүүдийн жагсаалт
+    post:
+      tags: [Room]
+      summary: Өрөө нэмэх
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomInput'
+      responses:
+        "201":
+          description: Үүслээ
+
+  /rooms/{id}:
+    get:
+      tags: [Room]
+      summary: Нэг өрөө авах
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      responses:
+        "200":
+          description: Өрөөний мэдээлэл
+    put:
+      tags: [Room]
+      summary: Өрөө бүтнээр солих
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomInput'
+            example:
+              code: "2201"
+              building: "2"
+              capacity: 45
+      responses:
+        "200":
+          description: Шинэчлэгдлээ
+    patch:
+      tags: [Room]
+      summary: Өрөөний багтаамж өөрчлөх
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                capacity:
+                  type: integer
+                  example: 50
+      responses:
+        "200":
+          description: Шинэчлэгдлээ
+    delete:
+      tags: [Room]
+      summary: Өрөө устгах
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "3"
+      responses:
+        "200":
+          description: Устгагдлаа
+
+  /rooms/{id}/courses:
+    get:
+      tags: [Relationship]
+      summary: Өрөө - Хичээлүүд
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      responses:
+        "200":
+          description: Тухайн өрөөнд орох хичээлүүд
+
+  /students:
+    get:
+      tags: [Students]
+      summary: Бүх оюутан харах (?search= шүүлтүүртэй)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+            example: del
+      responses:
+        "200":
+          description: Оюутнуудын жагсаалт
+    post:
+      tags: [Students]
+      summary: Шинэ оюутан нэмэх
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentCreate'
+      responses:
+        "201":
+          description: Үүслээ
+
+  /students/{id}:
+    get:
+      tags: [Students]
+      summary: Нэг оюутан id-гаар харах
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      responses:
+        "200":
+          description: Оюутны мэдээлэл
+        "404":
+          description: Олдсонгүй
+    put:
+      tags: [Students]
+      summary: Оюутны мэдээллийг бүтнээр өөрчлөх
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentCreate'
+      responses:
+        "200":
+          description: Шинэчлэгдлээ
+    patch:
+      tags: [Students]
+      summary: Student-ийн email өөрчлөх
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: newemail@university.edu
+      responses:
+        "200":
+          description: Шинэчлэгдлээ
+    delete:
+      tags: [Students]
+      summary: Оюутны мэдээлэл устгах
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "2"
+      responses:
+        "200":
+          description: Устгагдлаа
+
+  /teachers:
+    get:
+      tags: [Teacher]
+      summary: Бүх багш авах
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Багш нарын жагсаалт
+    post:
+      tags: [Teacher]
+      summary: Багш нэмэх
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeacherInput'
+      responses:
+        "201":
+          description: Үүслээ
+
+  /teachers/{id}:
+    get:
+      tags: [Teacher]
+      summary: Нэг багш авах
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      responses:
+        "200":
+          description: Багшийн мэдээлэл
+    put:
+      tags: [Teacher]
+      summary: Багш бүтнээр солих
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeacherInput'
+      responses:
+        "200":
+          description: Шинэчлэгдлээ
+    patch:
+      tags: [Teacher]
+      summary: Багшийн email өөрчлөх
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: new@msue.edu.mn
+      responses:
+        "200":
+          description: Шинэчлэгдлээ
+    delete:
+      tags: [Teacher]
+      summary: Багш устгах
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "2"
+      responses:
+        "200":
+          description: Устгагдлаа
+
+  /teachers/{id}/courses:
+    get:
+      tags: [Relationship]
+      summary: Багш - Хичээлүүд
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: "1"
+      responses:
+        "200":
+          description: Багшийн заах хичээлүүд

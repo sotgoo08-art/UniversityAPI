@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://localhost:3000/rooms?minCapacity=40
+method: GET
+queryParams:
+  minCapacity: "40"
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 9000

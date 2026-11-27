@@ -1,0 +1,11 @@
+$kind: http-request
+url: http://localhost:3000/departments/1
+method: PUT
+body:
+  type: json
+  content: '{"code":"IT","name":"Information Technology"}'
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 4000

@@ -1,0 +1,5 @@
+name: New Environment
+values:
+  - key: 'http://localhost:3000'
+    value: ''
+color: 120

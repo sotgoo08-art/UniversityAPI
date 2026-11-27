@@ -1,0 +1,11 @@
+$kind: http-request
+url: http://localhost:3000/departments
+method: POST
+body:
+  type: json
+  content: '{"code":"PH","name":"Physics"}	'
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 3000

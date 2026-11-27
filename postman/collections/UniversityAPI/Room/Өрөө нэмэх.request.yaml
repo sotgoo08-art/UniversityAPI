@@ -1,0 +1,11 @@
+$kind: http-request
+url: http://localhost:3000/rooms
+method: POST
+body:
+  type: json
+  content: '{"code":"2203","building":"2","capacity":40}'
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 3000

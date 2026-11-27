@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:3000/courses/1
+method: PUT
+order: 7000

@@ -1,0 +1,4 @@
+$kind: collection
+variables:
+  http://localhost:3000: ""
+  token: ""

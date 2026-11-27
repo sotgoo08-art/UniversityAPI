@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "username": "admin",
+    "passwordHash": "$2b$10$wKKTHyMXtGoqm2henv7mduJDkmv1WTfXS05B4TFH1A8jfGlJ1Oa/m",
+    "role": "admin"
+  },
+  {
+    "id": 2,
+    "username": "teacher1",
+    "passwordHash": "$2b$10$SpLM39VViGi97gVF5o5XkedddSF0E0bTGLwWVSGYax1LVSZQ3rhae",
+    "role": "teacher",
+    "teacherId": 1
+  },
+  {
+    "id": 3,
+    "username": "student1",
+    "passwordHash": "$2b$10$WRJ9Vt/rHPevgEbXkqvPve8zaXnhTeat/vAnJH13TS67U4K7HtmDW",
+    "role": "student",
+    "studentId": 1
+  }
+]

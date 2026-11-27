@@ -1,0 +1,8 @@
+$kind: http-request
+url: http://localhost:3000/courses/1/room
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 6000

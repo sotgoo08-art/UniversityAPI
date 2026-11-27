@@ -1,0 +1,11 @@
+$kind: http-request
+url: http://localhost:3000/teachers/1
+method: PATCH
+body:
+  type: json
+  content: '{"email":"new@msue.edu.mn"}'
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 5000

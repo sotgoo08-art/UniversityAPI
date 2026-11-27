@@ -1,0 +1,7 @@
+﻿const makeRoutes = require("./base-route");
+const c = require("../controllers/teacher-controller");
+
+const router = makeRoutes(c, { writeRoles: ["admin"], deleteRoles: ["admin"] });
+router.get("/:id/courses", c.getCourses);
+
+module.exports = router;

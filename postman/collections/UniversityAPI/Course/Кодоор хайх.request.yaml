@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:3000/courses?code=M.SW322
+method: GET
+queryParams:
+  code: M.SW322
+order: 10000

@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "firstName": "Delger",
+    "lastName": "Davaa",
+    "email": "newemail@university.edu"
+  },
+  {
+    "id": 3,
+    "firstName": "Ganaa",
+    "lastName": "Purev",
+    "email": "purev@example.com"
+  },
+  {
+    "id": 4,
+    "firstName": "Shashsuren",
+    "lastName": "Otgonjargal",
+    "email": "otgoo@example.com"
+  },
+  {
+    "id": 5,
+    "firstName": "Bold",
+    "lastName": "Ganbayar",
+    "email": "bold.g@example.com"
+  },
+  {
+    "id": 6,
+    "firstName": "Gerel",
+    "lastName": "Damdin",
+    "email": "gerel@gmail.com"
+  }
+]

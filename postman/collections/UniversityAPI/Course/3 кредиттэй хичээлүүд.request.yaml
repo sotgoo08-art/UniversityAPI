@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:3000/courses?credits=3
+method: GET
+queryParams:
+  credits: "3"
+order: 9000

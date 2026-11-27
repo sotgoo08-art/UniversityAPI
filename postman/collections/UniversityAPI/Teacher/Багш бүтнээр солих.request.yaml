@@ -1,0 +1,11 @@
+$kind: http-request
+url: http://localhost:3000/teachers/1
+method: PUT
+body:
+  type: json
+  content: '{"firstName":"Ulambayar","lastName":"Turtogtokh","email":"ulambayar@msue.edu.mn","departmentId":1}'
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 4000

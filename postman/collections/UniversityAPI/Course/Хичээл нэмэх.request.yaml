@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:3000/couses
+method: POST
+order: 6000

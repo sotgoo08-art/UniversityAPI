@@ -1,0 +1,11 @@
+$kind: http-request
+url: http://localhost:3000/rooms/1
+method: PUT
+body:
+  type: json
+  content: '{"code":"2201","building":"2","capacity":45}'
+auth:
+  type: bearer
+  credentials:
+    token: "{{token}}"
+order: 4000

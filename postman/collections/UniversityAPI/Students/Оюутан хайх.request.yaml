@@ -1,0 +1,6 @@
+$kind: http-request
+url: http://localhost:3000/students?search=del
+method: GET
+queryParams:
+  search: del
+order: 4499748986404944
